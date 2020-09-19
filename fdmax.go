@@ -1,6 +1,7 @@
 package fdmax
 
 import (
+	"runtime"
 	"syscall"
 )
 
@@ -26,6 +27,12 @@ func Get() (*Limits, error) {
 func Set(maxLimit uint64) error {
 	var rLimit syscall.Rlimit
 	rLimit.Max = maxLimit
-	rLimit.Cur = maxLimit
+
+	if runtime.GOOS == "darwin" && rLimit.Cur > 24576 {
+		rLimit.Cur = 24576
+	} else {
+		rLimit.Cur = maxLimit
+	}
+
 	return syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
 }
