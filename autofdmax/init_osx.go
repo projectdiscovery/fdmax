@@ -1,4 +1,4 @@
-// +build linux
+// +build darwin
 
 package autofdmax
 
@@ -7,5 +7,5 @@ import (
 )
 
 func init() {
-	fdmax.Set(fdmax.UnixMax)
+	fdmax.Set(fdmax.OSXMax)
 }
