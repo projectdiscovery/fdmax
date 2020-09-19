@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	Max uint64 = 999999
+	UnixMax uint64 = 999999
+	OSXMax  uint64 = 24576
 )
 
 type Limits struct {
@@ -28,10 +29,10 @@ func Set(maxLimit uint64) error {
 	var rLimit syscall.Rlimit
 	rLimit.Max = maxLimit
 
-	if runtime.GOOS == "darwin" && rLimit.Cur > 24576 {
-		rLimit.Cur = 24576
-	} else {
-		rLimit.Cur = maxLimit
+	rLimit.Cur = maxLimit
+	// https://github.com/golang/go/issues/30401
+	if runtime.GOOS == "darwin" && rLimit.Cur > OSXMax {
+		rLimit.Cur = OSXMax
 	}
 
 	return syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
