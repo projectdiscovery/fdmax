@@ -1,8 +1,11 @@
+// +build !windows
+
 package fdmax
 
 import (
 	"runtime"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -16,17 +19,17 @@ type Limits struct {
 }
 
 func Get() (*Limits, error) {
-	var rLimit syscall.Rlimit
-	err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	var rLimit unix.Rlimit
+	err := unix.Getrlimit(unix.RLIMIT_NOFILE, &rLimit)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Limits{Current: rLimit.Cur, Max: rLimit.Max}, nil
+	return &Limits{Current: uint64(rLimit.Cur), Max: uint64(rLimit.Max)}, nil
 }
 
 func Set(maxLimit uint64) error {
-	var rLimit syscall.Rlimit
+	var rLimit unix.Rlimit
 	rLimit.Max = maxLimit
 
 	rLimit.Cur = maxLimit
@@ -35,5 +38,5 @@ func Set(maxLimit uint64) error {
 		rLimit.Cur = OSXMax
 	}
 
-	return syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
+	return unix.Setrlimit(unix.RLIMIT_NOFILE, &rLimit)
 }

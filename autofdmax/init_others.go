@@ -1,4 +1,4 @@
-// +build windows
+// +build windows freebsd dragonfly plan9
 
 package autofdmax
 
