@@ -1,4 +1,4 @@
-// +build linux openbsd netbsd
+//go:build linux || openbsd || netbsd
 
 package autofdmax
 
