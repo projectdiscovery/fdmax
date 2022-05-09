@@ -7,5 +7,5 @@ import (
 )
 
 func init() {
-	fdmax.Set(fdmax.UnixMax)
+	_ = fdmax.Set(fdmax.UnixMax)
 }
