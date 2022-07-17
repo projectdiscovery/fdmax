@@ -23,6 +23,9 @@ func Get() (*Limits, error) {
 }
 
 func GetWithUlimit() (*Limits, error) {
+	if runtime.GOOS != "darwin" {
+		return nil, ErrUnsupportedPlatform
+	}
 	cmd := exec.Command("ulimit", "-n")
 	ulimitCurrent, err := cmd.Output()
 	if err != nil {
@@ -44,6 +47,9 @@ func Set(maxLimit uint64) error {
 }
 
 func SetWithUlimit(maxLimit uint64) error {
+	if runtime.GOOS != "darwin" {
+		return ErrUnsupportedPlatform
+	}
 	maxLimit = getMaxLimit(maxLimit)
 	cmd := exec.Command("ulimit", "-n", strconv.FormatUint(maxLimit, 10))
 	_, err := cmd.Output()

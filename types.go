@@ -3,8 +3,8 @@ package fdmax
 import "errors"
 
 var (
-	// UnsupportedPlatformError error if the platform doesn't support file descriptor increase via system api
-	UnsupportedPlatformError = errors.New("unsupported platform")
+	// ErrUnsupportedPlatform error if the platform doesn't support file descriptor increase via system api
+	ErrUnsupportedPlatform = errors.New("unsupported platform")
 )
 
 const (
