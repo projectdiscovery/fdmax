@@ -8,16 +8,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-const (
-	UnixMax uint64 = 999999
-	OSXMax  uint64 = 24576
-)
-
-type Limits struct {
-	Current uint64
-	Max     uint64
-}
-
+// Get the current limits
 func Get() (*Limits, error) {
 	var rLimit unix.Rlimit
 	err := unix.Getrlimit(unix.RLIMIT_NOFILE, &rLimit)
