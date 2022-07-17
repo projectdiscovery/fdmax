@@ -3,7 +3,10 @@
 package fdmax
 
 import (
+	"bytes"
+	"os/exec"
 	"runtime"
+	"strconv"
 
 	"golang.org/x/sys/unix"
 )
@@ -19,15 +22,37 @@ func Get() (*Limits, error) {
 	return &Limits{Current: uint64(rLimit.Cur), Max: uint64(rLimit.Max)}, nil
 }
 
+func GetWithUlimit() (*Limits, error) {
+	cmd := exec.Command("ulimit", "-n")
+	ulimitCurrent, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+	ulimitCurrent = bytes.ReplaceAll(ulimitCurrent, []byte("\n"), []byte(""))
+	ulimitCurrentInt, err := strconv.ParseUint(string(ulimitCurrent), 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	return &Limits{Current: ulimitCurrentInt, Max: ulimitCurrentInt}, nil
+}
+
 func Set(maxLimit uint64) error {
 	var rLimit unix.Rlimit
 	rLimit.Max = maxLimit
-
-	rLimit.Cur = maxLimit
-	// https://github.com/golang/go/issues/30401
-	if runtime.GOOS == "darwin" && rLimit.Cur > OSXMax {
-		rLimit.Cur = OSXMax
-	}
-
+	rLimit.Cur = getMaxLimit(maxLimit)
 	return unix.Setrlimit(unix.RLIMIT_NOFILE, &rLimit)
+}
+
+func SetWithUlimit(maxLimit uint64) error {
+	maxLimit = getMaxLimit(maxLimit)
+	cmd := exec.Command("ulimit", "-n", strconv.FormatUint(maxLimit, 10))
+	_, err := cmd.Output()
+	return err
+}
+
+func getMaxLimit(maxLimit uint64) uint64 {
+	if runtime.GOOS == "darwin" && maxLimit > OSXMax {
+		return OSXMax
+	}
+	return maxLimit
 }
