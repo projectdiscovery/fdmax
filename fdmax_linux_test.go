@@ -3,7 +3,6 @@
 package fdmax
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
