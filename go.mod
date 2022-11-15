@@ -1,10 +1,10 @@
 module github.com/projectdiscovery/fdmax
 
-go 1.17
+go 1.18
 
 require (
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6
+	golang.org/x/sys v0.2.0
 )
 
 require (
