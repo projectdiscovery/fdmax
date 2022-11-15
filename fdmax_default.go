@@ -4,6 +4,7 @@ package fdmax
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 	"runtime"
 	"strconv"
@@ -61,4 +62,9 @@ func getMaxLimit(maxLimit uint64) uint64 {
 		return OSXMax
 	}
 	return maxLimit
+}
+
+// test for trigger the github action
+func JustAtest() {
+	fmt.Println("Something")
 }
