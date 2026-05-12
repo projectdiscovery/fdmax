@@ -8,6 +8,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestOSXMaxFromSysctl(t *testing.T) {
+	require.GreaterOrEqual(t, OSXMax, uint64(24576))
+	require.LessOrEqual(t, OSXMax, uint64(1<<22))
+}
+
 func TestFileDescriptors(t *testing.T) {
 	before, err := Get()
 	require.Nil(t, err)
