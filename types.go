@@ -7,12 +7,12 @@ var (
 	ErrUnsupportedPlatform = errors.New("unsupported platform")
 )
 
-const (
-	// UnixMax on unix systems
-	UnixMax uint64 = 999999
-	// OSXMax on darwin
-	OSXMax uint64 = 24576
-)
+// UnixMax on unix systems.
+const UnixMax uint64 = 999999
+
+// OSXMax on darwin. Populated from kern.maxfilesperproc at init on darwin;
+// the literal here is a fallback for other platforms and when the sysctl fails.
+var OSXMax uint64 = 24576
 
 // Limits contains the file system descriptor limits
 type Limits struct {

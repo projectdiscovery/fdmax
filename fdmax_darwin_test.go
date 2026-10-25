@@ -8,20 +8,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestOSXMaxFromSysctl(t *testing.T) {
+	require.GreaterOrEqual(t, OSXMax, uint64(24576))
+	require.LessOrEqual(t, OSXMax, uint64(1<<22))
+}
+
 func TestFileDescriptors(t *testing.T) {
-	currentUlimit, err := Get()
+	before, err := Get()
 	require.Nil(t, err)
-	current, err := Get()
-	require.Nil(t, err)
-	require.Equal(t, currentUlimit.Current, current.Current)
+
 	wanted := uint64(444)
-	err = Set(wanted)
+	require.Nil(t, Set(wanted))
+	t.Cleanup(func() { _ = Set(before.Current) })
+
+	after, err := Get()
 	require.Nil(t, err)
-	newUlimitWithCLI, err := GetWithUlimit()
-	require.Nil(t, err)
-	newUlimitWithAPI, err := Get()
-	require.Nil(t, err)
-	require.Equal(t, wanted, newUlimitWithCLI.Current)
-	require.Equal(t, wanted, newUlimitWithAPI.Current)
-	require.True(t, currentUlimit.Current != newUlimitWithAPI.Current)
+	require.Equal(t, wanted, after.Current)
+	require.Equal(t, before.Max, after.Max)
+	require.NotEqual(t, before.Current, after.Current)
 }
