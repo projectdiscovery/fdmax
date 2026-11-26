@@ -39,8 +39,9 @@ func GetWithUlimit() (*Limits, error) {
 	return &Limits{Current: ulimitCurrentInt, Max: ulimitCurrentInt}, nil
 }
 
-// Set raises or lowers the soft RLIMIT_NOFILE; the hard limit is left untouched
-// so unprivileged callers can still raise the soft limit later.
+// Set raises or lowers the soft RLIMIT_NOFILE. The hard limit is never
+// lowered. When the request exceeds it, privileged callers get the hard limit
+// raised to match; everyone else is clamped to the existing hard limit.
 func Set(maxLimit uint64) error {
 	var rLimit unix.Rlimit
 	if err := unix.Getrlimit(unix.RLIMIT_NOFILE, &rLimit); err != nil {
@@ -48,6 +49,10 @@ func Set(maxLimit uint64) error {
 	}
 	cur := getMaxLimit(maxLimit)
 	if cur > rLimit.Max {
+		raised := unix.Rlimit{Cur: cur, Max: cur}
+		if err := unix.Setrlimit(unix.RLIMIT_NOFILE, &raised); err == nil {
+			return nil
+		}
 		cur = rLimit.Max
 	}
 	rLimit.Cur = cur

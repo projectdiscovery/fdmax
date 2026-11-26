@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
 )
 
 func TestOSXMaxFromSysctl(t *testing.T) {
-	require.GreaterOrEqual(t, OSXMax, uint64(24576))
-	require.LessOrEqual(t, OSXMax, uint64(1<<22))
+	v, err := unix.SysctlUint32("kern.maxfilesperproc")
+	require.NoError(t, err)
+	require.Equal(t, uint64(v), OSXMax)
 }
 
 func TestFileDescriptors(t *testing.T) {
